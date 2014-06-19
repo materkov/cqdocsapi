@@ -50,11 +50,11 @@ admins | Массив, ID пользователей, которым разре�
         2
       ],
       "settings": {
-        "maxDiscount": "0.05",
-        "convertedPercent": "0.3",
+        "max_discount": "0.05",
+        "converted_percent": "0.3",
         "bonus": true,
         "bonus_account": "",
-        "bonusLanding": "http://example.com/"
+        "bonus_landing": "http://example.com/"
       }
     }
   },
