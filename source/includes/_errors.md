@@ -1,20 +1,73 @@
-# Errors
+# Ошибки
 
-<aside class="notice">This error section is stored in a separate file in `includes/_errors.md`. Slate allows you to optionally separate out your docs into many files...just save them to the `includes` folder and add them to the top of your `index.md`'s frontmatter. Files are included in the order listed.</aside>
+Ответы будут содержать правильные стандартные HTTP-коды:
 
-The Kittn API uses the following error codes:
+> Примеры ошибочных ответов:
+
+```json
+{
+  "data": {},
+  "meta": {
+    "status": 403,
+    "error": "AuthenticationFailed",
+    "error_message": "Invalid auth_token"
+  }
+}
+```
+
+```json
+{
+  "data": {},
+  "meta": {
+    "status": 400,
+    "error_fields": {
+      "type": [
+        "This field is required."
+      ],
+      "html": [
+        "This field is required."
+      ]
+    },
+    "error": "BadRequest",
+    "error_message": "The request could not be understood by the server due to malformed syntax"
+  }
+}
+```
 
 
-Error Code | Meaning
+
+Код | Описание
 ---------- | -------
-400 | Bad Request -- Your request sucks
-401 | Unauthorized -- Your API key is wrong
-403 | Forbidden -- The kitten requested is hidden for administrators only
-404 | Not Found -- The specified kitten could not be found
-405 | Method Not Allowed -- You tried to access a kitten with an invalid method
-406 | Not Acceptable -- You requested a format that isn't json
-410 | Gone -- The kitten requested has been removed from our servers
-418 | I'm a teapot
-429 | Too Many Requests -- You're requesting too many kittens! Slown down!
-500 | Internal Server Error -- We had a problem with our server. Try again later.
-503 | Service Unavailable -- We're temporarially offline for maintanance. Please try again later.
+400 | Bad Request -- Неверные запрос (пустые или неправильные аргументы)
+403 | Forbidden -- Нет доступа к данному методу
+404 | Not Found -- Метода не существует
+405 | Method Not Allowed -- Не разрешенный метод (например, POST вместо GET)
+500, 502, 503, 504 | Internal Server Error -- Что то не так с сервером
+
+В случае ошибки, объект `data` будет пуст, а в объекте `meta` будут содержаться поля:
+
+Название | Описание
+---      | ---
+status   | HTTP-код
+error    | Название ошибки
+error_message | Детальное описание ошибки
+error_fields | В случае, если ошибка BadRequest, здесь будет содержаться информация об ошибках в параметрах
+
+
+Название ошибки (`error`) специфично для каждого метода, однако, имеются 
+некоторые ошибки, которые есть везде:
+
+Название | Описание
+---      | ---
+BadRequest | Неправильные или отсутствующие параметры
+AuthenticationFailed | Отсутствующий, неверный или отозванный auth_token
+InvalidAuthType | auth_token верный, но его нельзя использовать в методе
+MethodNotAllowed | Неправильный HTTP-метод
+
+
+
+# Автопараметры
+В некоторых случаях, когда нужно передать в качестве аргумента ID пользователя или ID приложения,
+можно использовать сокращения - $self_user и $self_app соответственно.
+Если auth_token связан с приложением или пользователем, то эти параметры будут заменены на ID 
+"текущего"" пользователя и приложения соответственно

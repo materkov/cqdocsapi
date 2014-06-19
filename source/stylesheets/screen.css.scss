@@ -482,3 +482,47 @@ html, body {
     }
   }
 }
+
+/* --------------------------- MY STYLES --------------------------- */
+#tocify-header7:before {
+  content: "МЕТОДЫ:";
+  color: #888;
+  padding-left: 15px;
+  font-size: 11px;
+}
+
+#tocify-header7 {
+  margin-top: 30px;
+}
+
+.example-object:after {
+  content: "dssadad";
+}
+
+.method-request:before {
+  content: "ОПРЕДЕЛЕНИЕ:";
+  display: block;
+  padding-bottom: 10px;
+  color: #777;
+}
+
+.method-input:before {
+  content: "ПРИМЕР ЗАПРОСА:";
+  display: block;
+  padding-bottom: 10px;
+  color: #777;
+}
+
+.method-output:before {
+  content: "ПРИМЕР ОТВЕТА:";
+  display: block;
+  padding-bottom: 10px;
+  color: #777;
+}
+
+.object-example-code:before {
+  content: "ПРИМЕР ОБЪЕКТА:";
+  display: block;
+  padding-bottom: 10px;
+  color: #777;
+}

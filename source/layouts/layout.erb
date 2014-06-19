@@ -30,6 +30,27 @@ under the License.
       <script>
         $(function() {
           setupLanguages(<%= language_tabs.map{ |lang| lang.is_a?(Hash) ? lang.keys.first : lang }.to_json %>);
+
+          // Colorize objects description
+          $('.tocify-item').each(function(index) {
+            var aElem = $(this).children()
+            if (aElem.text().lastIndexOf('Объект', 0) === 0) {
+              aElem.css("font-style", "italic");
+            }
+          });
+
+          // Colorize request defenition
+          $('pre.highlight.plaintext').each(function() {
+            if (/(GET|POST|PUT|DELETE).*/.test($(this).text())) {
+              $(this).addClass('method-request');
+              $(this).next().addClass('method-input');
+              $(this).next().next().addClass('method-output');
+            }
+          });
+
+          $('.object-example').each(function() {
+            $(this).parent().next().addClass('object-example-code');
+          });
         });
       </script>
     <% end %>
