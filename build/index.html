@@ -13,6 +13,27 @@
       <script>
         $(function() {
           setupLanguages(["shell"]);
+
+          // Colorize objects description
+          $('.tocify-item').each(function(index) {
+            var aElem = $(this).children()
+            if (aElem.text().lastIndexOf('Объект', 0) === 0) {
+              aElem.css("font-style", "italic");
+            }
+          });
+
+          // Colorize request defenition
+          $('pre.highlight.plaintext').each(function() {
+            if (/(GET|POST|PUT|DELETE).*/.test($(this).text())) {
+              $(this).addClass('method-request');
+              $(this).next().addClass('method-input');
+              $(this).next().next().addClass('method-output');
+            }
+          });
+
+          $('.object-example').each(function() {
+            $(this).parent().next().addClass('object-example-code');
+          });
         });
       </script>
   </head>
@@ -60,24 +81,7 @@
 </span><span class="p">}</span><span class="w">
 </span></pre>
 
-<p>Есть два обязательных объекта, присутсвующих в каждом ответе: <code class="prettyprint">data</code> и <code class="prettyprint">meta</code>. Блок <code class="prettyprint">meta</code> содержит метаданные об ответе. Поле <code class="prettyprint">status</code> совпадает с HTTP кодом возврата. Варианты: 200 (OK), 400 (неправильный запрос), 403 (не авторизован), 404 (неверный адрес), 500 (внутренняя ошибка сервера). Если status не равен 200, то добавляются поля <code class="prettyprint">error</code> и <code class="prettyprint">errorMessage</code>.</p>
-
-<blockquote>
-<p>Пример ошибочного ответа</p>
-</blockquote>
-<pre class="highlight json"><span class="p">{</span><span class="w">
-  </span><span class="s2">"meta"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-    </span><span class="s2">"error"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Error404"</span><span class="p">,</span><span class="w"> 
-    </span><span class="s2">"errorMessage"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Path '/api/sdf' not found"</span><span class="p">,</span><span class="w"> 
-    </span><span class="s2">"status"</span><span class="p">:</span><span class="w"> </span><span class="mi">404</span><span class="w">
-  </span><span class="p">},</span><span class="w"> 
-  </span><span class="s2">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-
-  </span><span class="p">}</span><span class="w">
-</span><span class="p">}</span><span class="w">
-</span></pre>
-
-<p>Блок <code class="prettyprint">data</code> содержит сам ответ.</p>
+<p>Есть два обязательных объекта, присутсвующих в каждом ответе: <code class="prettyprint">data</code> и <code class="prettyprint">meta</code>. Блок <code class="prettyprint">meta</code> содержит метаданные об ответе. Поле <code class="prettyprint">status</code> совпадает с HTTP кодом возврата. Блок <code class="prettyprint">data</code> содержит сам ответ.</p>
 
 <h1 id="Стиль">Стиль</h1>
 
@@ -86,6 +90,8 @@
 <p>Все, что начинается с символа $ - систмное имя.</p>
 
 <p>Все параметры к запросам - необязательные, если явно не указано обратное.</p>
+
+<p>Стиль именования переменных - under_score (стандартный для python)</p>
 
 <h1 id="Ключи">Ключи</h1>
 
@@ -142,67 +148,131 @@
 
 <p>Например, чтобы обратиться к конечной точке <code class="prettyprint">/users/USER_ID/carrots</code> с серверной стороны, нужно сделать запрос на URL <code class="prettyprint">http://api.carrotquest.io/v1/users/USER_ID/carrots?auth_token=app.XXX.YYY</code> (здесь apikey=XXX, apisecret=YYY)</p>
 
-          <h1 id="errors">Errors</h1>
+          <h1 id="Ошибки">Ошибки</h1>
 
-<p><aside class="notice">This error section is stored in a separate file in <code class="prettyprint">includes/_errors.md</code>. Slate allows you to optionally separate out your docs into many files&hellip;just save them to the <code class="prettyprint">includes</code> folder and add them to the top of your <code class="prettyprint">index.md</code>&rsquo;s frontmatter. Files are included in the order listed.</aside></p>
+<p>Ответы будут содержать правильные стандартные HTTP-коды:</p>
 
-<p>The Kittn API uses the following error codes:</p>
+<blockquote>
+<p>Примеры ошибочных ответов:</p>
+</blockquote>
+<pre class="highlight json"><span class="p">{</span><span class="w">
+  </span><span class="s2">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span><span class="w">
+  </span><span class="s2">"meta"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"status"</span><span class="p">:</span><span class="w"> </span><span class="mi">403</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"error"</span><span class="p">:</span><span class="w"> </span><span class="s2">"AuthenticationFailed"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"error_message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Invalid auth_token"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></pre>
+<pre class="highlight json"><span class="p">{</span><span class="w">
+  </span><span class="s2">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span><span class="w">
+  </span><span class="s2">"meta"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"status"</span><span class="p">:</span><span class="w"> </span><span class="mi">400</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"error_fields"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="s2">"This field is required."</span><span class="w">
+      </span><span class="p">],</span><span class="w">
+      </span><span class="s2">"html"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="s2">"This field is required."</span><span class="w">
+      </span><span class="p">]</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"error"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BadRequest"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"error_message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"The request could not be understood by the server due to malformed syntax"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></pre>
 
 <table><thead>
 <tr>
-<th>Error Code</th>
-<th>Meaning</th>
+<th>Код</th>
+<th>Описание</th>
 </tr>
 </thead><tbody>
 <tr>
 <td>400</td>
-<td>Bad Request &ndash; Your request sucks</td>
-</tr>
-<tr>
-<td>401</td>
-<td>Unauthorized &ndash; Your API key is wrong</td>
+<td>Bad Request &ndash; Неверные запрос (пустые или неправильные аргументы)</td>
 </tr>
 <tr>
 <td>403</td>
-<td>Forbidden &ndash; The kitten requested is hidden for administrators only</td>
+<td>Forbidden &ndash; Нет доступа к данному методу</td>
 </tr>
 <tr>
 <td>404</td>
-<td>Not Found &ndash; The specified kitten could not be found</td>
+<td>Not Found &ndash; Метода не существует</td>
 </tr>
 <tr>
 <td>405</td>
-<td>Method Not Allowed &ndash; You tried to access a kitten with an invalid method</td>
+<td>Method Not Allowed &ndash; Не разрешенный метод (например, POST вместо GET)</td>
 </tr>
 <tr>
-<td>406</td>
-<td>Not Acceptable &ndash; You requested a format that isn&rsquo;t json</td>
-</tr>
-<tr>
-<td>410</td>
-<td>Gone &ndash; The kitten requested has been removed from our servers</td>
-</tr>
-<tr>
-<td>418</td>
-<td>I&rsquo;m a teapot</td>
-</tr>
-<tr>
-<td>429</td>
-<td>Too Many Requests &ndash; You&rsquo;re requesting too many kittens! Slown down!</td>
-</tr>
-<tr>
-<td>500</td>
-<td>Internal Server Error &ndash; We had a problem with our server. Try again later.</td>
-</tr>
-<tr>
-<td>503</td>
-<td>Service Unavailable &ndash; We&rsquo;re temporarially offline for maintanance. Please try again later.</td>
+<td>500, 502, 503, 504</td>
+<td>Internal Server Error &ndash; Что то не так с сервером</td>
 </tr>
 </tbody></table>
 
+<p>В случае ошибки, объект <code class="prettyprint">data</code> будет пуст, а в объекте <code class="prettyprint">meta</code> будут содержаться поля:</p>
+
+<table><thead>
+<tr>
+<th>Название</th>
+<th>Описание</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>status</td>
+<td>HTTP-код</td>
+</tr>
+<tr>
+<td>error</td>
+<td>Название ошибки</td>
+</tr>
+<tr>
+<td>error_message</td>
+<td>Детальное описание ошибки</td>
+</tr>
+<tr>
+<td>error_fields</td>
+<td>В случае, если ошибка BadRequest, здесь будет содержаться информация об ошибках в параметрах</td>
+</tr>
+</tbody></table>
+
+<p>Название ошибки (<code class="prettyprint">error</code>) специфично для каждого метода, однако, имеются 
+некоторые ошибки, которые есть везде:</p>
+
+<table><thead>
+<tr>
+<th>Название</th>
+<th>Описание</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>BadRequest</td>
+<td>Неправильные или отсутствующие параметры</td>
+</tr>
+<tr>
+<td>AuthenticationFailed</td>
+<td>Отсутствующий, неверный или отозванный auth_token</td>
+</tr>
+<tr>
+<td>InvalidAuthType</td>
+<td>auth_token верный, но его нельзя использовать в методе</td>
+</tr>
+<tr>
+<td>MethodNotAllowed</td>
+<td>Неправильный HTTP-метод</td>
+</tr>
+</tbody></table>
+
+<h1 id="Автопараметры">Автопараметры</h1>
+
+<p>В некоторых случаях, когда нужно передать в качестве аргумента ID пользователя или ID приложения,
+можно использовать сокращения - $self_user и $self_app соответственно.
+Если auth_token связан с приложением или пользователем, то эти параметры будут заменены на ID 
+&ldquo;текущего&rdquo;&ldquo; пользователя и приложения соответственно</p>
+
           <h1 id="auth">Auth</h1>
 
-<h2 id="Авторизация-из-js-из-приложения">Авторизация из JS из приложения</h2>
+<h2 id="Авторизоваться-из-js-на-сайте-приложения">Авторизоваться из JS на сайте приложения</h2>
 <pre class="highlight plaintext">POST http://api.carrotquest.io/v1/auth/jsconnect?auth_token=XXX
 </pre>
 <pre class="highlight shell">curl <span class="s2">"http://api.carrotquest.io/v1/auth/jsconnect?auth_token=XXX"</span> <span class="se">\</span>
@@ -249,7 +319,7 @@
 </tr>
 </tbody></table>
 
-<h2 id="Установка-глобального-тукена">Установка глобального тукена</h2>
+<h2 id="Установить-глобальный-тукен">Установить глобальный тукен</h2>
 <pre class="highlight plaintext">GET http://api.carrotquest.io/v1/auth/trackglobal
 </pre>
 <pre class="highlight shell">curl <span class="s2">"http://api.carrotquest.io/v1/auth/trackglobal?auth_token=XXX"</span>
@@ -267,7 +337,7 @@
 
 <p>Вопрос - зачем нужен глобальные и &ldquo;локальные&rdquo; тукены? Оказалось, что некоторые браузеры (Сафари) не позволяют ставить куки на домены тех сайтов, которые пользователь ни разу не посещал. То есть, например, человек захдит на сайт www.ecodomshop.ru и наша система попытается установить куку, но на домене .carrotquest.io. Этот гадкий браузер не даст этого сделать! Пэтому такая морока с авторизацией и такое разнообразие типов авторизации.</p>
 
-<h2 id="Вход-в-личный-кабинет">Вход в личный кабинет</h2>
+<h2 id="Войти-в-личный-кабинет">Войти в личный кабинет</h2>
 <pre class="highlight plaintext">POST http://api.carrotquest.io/v1/auth/accountlogin
 </pre>
 <pre class="highlight shell">curl <span class="s2">"http://api.carrotquest.io/v1/auth/accountlogin"</span> <span class="se">\</span>
@@ -306,13 +376,13 @@
 </tr>
 </tbody></table>
 
-<h2 id="Регистрация-в-бонусной-системе">Регистрация в бонусной системе</h2>
+<h2 id="Зарегистрироваться-в-бонусной-системе">Зарегистрироваться в бонусной системе</h2>
 <pre class="highlight plaintext">POST http://api.carrotquest.io/v1/auth/accountregister
 </pre>
 
 <p>Попытка регистрации пользователя в бонусной системе. Параметр - email. Если такого емейла нет, то он регистрируется (пароль высылается на почту). Если регистрация успешна, в ответе будет содержаться authToken для работы в личном кабинете (тукен типа <code class="prettyprint">account.XXX</code>)</p>
 
-<h2 id="Вход-в-панель-администратора">Вход в панель администратора</h2>
+<h2 id="Войти-в-панель-администратора">Войти в панель администратора</h2>
 <pre class="highlight plaintext">POST http://api.carrotquest.io/v1/auth/panellogin
 </pre>
 <pre class="highlight shell">curl <span class="s2">"http://api.carrotquest.io/v1/auth/panellogin?auth_token=XXX"</span> <span class="se">\</span>
@@ -355,7 +425,7 @@
 
 <p>Возвращает authToken</p>
 
-<h2 id="Проверка-тукена">Проверка тукена</h2>
+<h2 id="Проверить-тукен">Проверить тукен</h2>
 <pre class="highlight plaintext">GET http://api.carrotquest.io/v1/auth/checktoken
 </pre>
 <pre class="highlight shell">curl <span class="s2">"http://api.carrotquest.io/v1/auth/checktoken?auth_token=XXX"</span>
@@ -384,9 +454,7 @@
 
 <h2 id="Объект-app">Объект App</h2>
 
-<blockquote>
-<p>Пример объекта</p>
-</blockquote>
+<p><span class="object-example"></span></p>
 <pre class="highlight json"><span class="p">{</span><span class="w">
   </span><span class="s2">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
     </span><span class="s2">"app"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
@@ -425,7 +493,7 @@
 <td>Адрес приложения</td>
 </tr>
 <tr>
-<td>apiKey</td>
+<td>api_key</td>
 <td>API Key</td>
 </tr>
 <tr>
@@ -436,17 +504,15 @@
 
 <h2 id="Объект-app-(расширенный)">Объект App (расширенный)</h2>
 
-<blockquote>
-<p>Пример объекта</p>
-</blockquote>
+<p><span class="object-example"></span></p>
 <pre class="highlight json"><span class="p">{</span><span class="w">
   </span><span class="s2">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
     </span><span class="s2">"app"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
       </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
       </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Test shop2"</span><span class="p">,</span><span class="w">
       </span><span class="s2">"origin"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://example.com"</span><span class="p">,</span><span class="w">
-      </span><span class="s2">"apiKey"</span><span class="p">:</span><span class="w"> </span><span class="s2">"e6rF5TPZhrWX2TArwvXWFJ20b6r3xQHf"</span><span class="p">,</span><span class="w">
-      </span><span class="s2">"apiSecret"</span><span class="p">:</span><span class="w"> </span><span class="s2">"lvM9T5pm14WGOzvYyHc5ZCMtwss7apZ4H9i2LNeoyw3KbI6J5BcHlhDfCpeIpBN8"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"api_key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"e6rF5TPZhrWX2TArwvXWFJ20b6r3xQHf"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"api_secret"</span><span class="p">:</span><span class="w"> </span><span class="s2">"lvM9T5pm14WGOzvYyHc5ZCMtwss7apZ4H9i2LNeoyw3KbI6J5BcHlhDfCpeIpBN8"</span><span class="p">,</span><span class="w">
       </span><span class="s2">"admins"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
         </span><span class="mi">1</span><span class="p">,</span><span class="w">
         </span><span class="mi">2</span><span class="w">
@@ -485,11 +551,11 @@
 <td>Адрес приложения</td>
 </tr>
 <tr>
-<td>apiKey</td>
+<td>api_key</td>
 <td>API Key</td>
 </tr>
 <tr>
-<td>apiSecret</td>
+<td>api_secret</td>
 <td>API Secret</td>
 </tr>
 <tr>
@@ -497,11 +563,11 @@
 <td>Массив, ID пользователей, которым разрешен доступ к панели администратора этого рпиложения</td>
 </tr>
 <tr>
-<td>settings.maxDiscount</td>
+<td>settings.max_discount</td>
 <td>Максимальный процент скидки</td>
 </tr>
 <tr>
-<td>settings.convertedPercent</td>
+<td>settings.converted_percent</td>
 <td>Процент от цены, который конвертируется в морковки</td>
 </tr>
 <tr>
@@ -509,12 +575,12 @@
 <td>Включена ли бонусная система</td>
 </tr>
 <tr>
-<td>settings.bonusLanding</td>
+<td>settings.bonus_landing</td>
 <td>Стрнаица, на которую ведут реккомендации</td>
 </tr>
 </tbody></table>
 
-<h2 id="Информация-о-приложении">Информация о приложении</h2>
+<h2 id="Получить-информацию-о-приложении">Получить информацию о приложении</h2>
 <pre class="highlight plaintext">GET http://api.carrotquest.io/v1/apps/{APP_ID}
 </pre>
 <pre class="highlight shell">curl <span class="s2">"http://api.carrotquest.io/v1/apps/5?auth_token=XXX"</span>
@@ -544,7 +610,7 @@
 
 <p>Возвращает <a href="#Объект-app">базовый объект App</a></p>
 
-<h2 id="Расширенная-информация-о-приложении">Расширенная информация о приложении</h2>
+<h2 id="Получить-расширенную-информацию-о-приложении">Получить расширенную информацию о приложении</h2>
 <pre class="highlight plaintext">GET http://api.carrotquest.io/v1/apps/{APP_ID}/extendedinfo
 </pre>
 <pre class="highlight shell">curl <span class="s2">"http://api.carrotquest.io/v1/apps/5/extendedinfo?auth_token=XXX"</span>
@@ -555,18 +621,18 @@
       </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
       </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Test shop2"</span><span class="p">,</span><span class="w">
       </span><span class="s2">"origin"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://localhost:8080"</span><span class="p">,</span><span class="w">
-      </span><span class="s2">"apiKey"</span><span class="p">:</span><span class="w"> </span><span class="s2">"e6rF5TPchrWXE5ArwwXWFJ20b6rOxQHf"</span><span class="p">,</span><span class="w">
-      </span><span class="s2">"apiSecret"</span><span class="p">:</span><span class="w"> </span><span class="s2">"lvM9T5pm14WGvzvYyHm5ZCjtwss7apZ4W9i1LNeoywwKbI6J5BcHdhDfCpeIpBN8"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"api_key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"e6rF5TPchrWXE5ArwwXWFJ20b6rOxQHf"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"api_secret"</span><span class="p">:</span><span class="w"> </span><span class="s2">"lvM9T5pm14WGvzvYyHm5ZCjtwss7apZ4W9i1LNeoywwKbI6J5BcHdhDfCpeIpBN8"</span><span class="p">,</span><span class="w">
       </span><span class="s2">"admins"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
         </span><span class="mi">1</span><span class="p">,</span><span class="w">
         </span><span class="mi">2</span><span class="w">
       </span><span class="p">],</span><span class="w">
       </span><span class="s2">"settings"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-        </span><span class="s2">"maxDiscount"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0.05"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"convertedPercent"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0.3"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"max_discount"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0.05"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"converted_percent"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0.3"</span><span class="p">,</span><span class="w">
         </span><span class="s2">"bonus"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
         </span><span class="s2">"bonus_account"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"bonusLanding"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://localhost:8080/"</span><span class="w">
+        </span><span class="s2">"bonus_landing"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://localhost:8080/"</span><span class="w">
       </span><span class="p">}</span><span class="w">
     </span><span class="p">}</span><span class="w">
   </span><span class="p">},</span><span class="w">
@@ -576,7 +642,7 @@
 </span><span class="p">}</span><span class="w">
 </span></pre>
 
-<p>Выдает базовую, общедоступную информацию о приложении.</p>
+<p>Выдает расширенную информацию о приложении.</p>
 
 <h3 id="Возаращаемое-значение">Возаращаемое значение</h3>
 
@@ -595,7 +661,7 @@
       </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
       </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Test shop2"</span><span class="p">,</span><span class="w">
       </span><span class="s2">"origin"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://localhost:8080"</span><span class="p">,</span><span class="w">
-      </span><span class="s2">"apiKey"</span><span class="p">:</span><span class="w"> </span><span class="s2">"e6rF5TPchrWXE5ArwwXWFJ20b6rOxQHf"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"api_key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"e6rF5TPchrWXE5ArwwXWFJ20b6rOxQHf"</span><span class="p">,</span><span class="w">
       </span><span class="s2">"admins"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
         </span><span class="mi">3</span><span class="w">
       </span><span class="p">]</span><span class="w">
@@ -633,6 +699,63 @@
 
 <p>Если имя не уникально, возвращатся ошибка <code class="prettyprint">AppNameDuplicate</code> (статус 400)</p>
 
+<h2 id="Обновить-приложение">Обновить приложение</h2>
+<pre class="highlight plaintext">PUT http://api.carrotquest.io/v1/apps/{APP_ID}
+</pre>
+<pre class="highlight shell">curl <span class="s2">"http://api.carrotquest.io/v1/apps/5?auth_token=XXX&amp;name=MySuperApp"</span>
+  -X PUT
+  -d <span class="nv">origin</span><span class="o">=</span>http://example.com
+  -d <span class="s2">"name=My name"</span>
+  -d <span class="nv">converted_percent</span><span class="o">=</span>0.05
+  -d <span class="nv">max_discount</span><span class="o">=</span>0.10
+  -d <span class="nv">bonus</span><span class="o">=</span><span class="nb">true</span>
+  -d <span class="s2">"bonus_landing=http://example.com/some_page.php"</span>
+</pre>
+<pre class="highlight json"><span class="p">{</span><span class="w">
+  </span><span class="s2">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="s2">"meta"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"status"</span><span class="p">:</span><span class="w"> </span><span class="mi">200</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></pre>
+
+<p>Обновляет информацию о приложении</p>
+
+<h3 id="Параметры">Параметры</h3>
+
+<table><thead>
+<tr>
+<th>Название</th>
+<th>Описание</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>name</td>
+<td><strong>обязательный</strong> Название приложения</td>
+</tr>
+<tr>
+<td>origin</td>
+<td><strong>обязательный</strong> Адрес приложения</td>
+</tr>
+<tr>
+<td>max_discount</td>
+<td><strong>обязательный</strong> Максимальный процент скидки</td>
+</tr>
+<tr>
+<td>converted_percent</td>
+<td><strong>обязательный</strong> Процент от цены, который конвертируется в морковки</td>
+</tr>
+<tr>
+<td>bonus</td>
+<td><strong>обязательный</strong> Включена ли бонусная система</td>
+</tr>
+<tr>
+<td>bonus_landing</td>
+<td><strong>обязательный</strong> Стрнаица, на которую ведут реккомендации</td>
+</tr>
+</tbody></table>
+
 <h2 id="Проверить-занятость-имени">Проверить занятость имени</h2>
 <pre class="highlight plaintext">GET http://api.carrotquest.io/v1/apps/checknameavailable
 </pre>
@@ -668,7 +791,119 @@
 
 <p>Если имя доступно, то перемнная <code class="prettyprint">available</code> будет иметь значение <code class="prettyprint">true</code>; иначе - <code class="prettyprint">false</code></p>
 
-          <h1 id="&nbsp;">&nbsp;</h1>
+          <h1 id="events">Events</h1>
+
+<h2 id="Объект-event">Объект Event</h2>
+
+<h2 id="Создать-событие">Создать событие</h2>
+<pre class="highlight plaintext">POST http://api.carrotquest.io/v1/events
+</pre>
+<pre class="highlight shell">curl <span class="s2">"http://api.carrotquest.io/v1/events?auth_token=XXX"</span> <span class="se">\</span>
+  -d <span class="s2">"event=My Event"</span> <span class="se">\</span>
+  -d <span class="s2">"app=</span><span class="nv">$self_app</span><span class="s2">"</span> <span class="se">\</span>
+  -d <span class="s2">"user=</span><span class="nv">$self_user</span><span class="s2">"</span>
+</pre>
+<pre class="highlight json"><span class="p">{</span><span class="w">
+  </span><span class="s2">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"carrots"</span><span class="p">:</span><span class="w"> </span><span class="mi">15</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="s2">"meta"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"status"</span><span class="p">:</span><span class="w"> </span><span class="mi">200</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></pre>
+
+<p>Создает новое событие (трекинг). К событию может быть привязан объект (но необязательно). </p>
+
+<p>Объекты могут быть разных типов. Самый частый тип &ndash; товар в интернет-магазине. Поэтому
+зарегистрирован системный тип &ndash; <code class="prettyprint">$product</code>. Если есть товары, то нужно использовать его.
+Своих типов можно создавать сколько угодно.</p>
+
+<p>Имя события может быть любым, не начинающимся с символа $.
+Зарезервированные системные события: </p>
+
+<table><thead>
+<tr>
+<th>Название</th>
+<th>Описание</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>$basket_add</td>
+<td>Добавил товар в корзину</td>
+</tr>
+<tr>
+<td>$purchase</td>
+<td>Покупка (заказ состоит из нескольких покупок, каждый отдельный товар в заказе - это отдельная покупка)</td>
+</tr>
+<tr>
+<td>$order</td>
+<td>Сделал заказ</td>
+</tr>
+<tr>
+<td>$product_view</td>
+<td>Просмотрел товар</td>
+</tr>
+<tr>
+<td>$session_start</td>
+<td>Начал сессию</td>
+</tr>
+<tr>
+<td>$message_sended</td>
+<td>Отправлено сообщение</td>
+</tr>
+<tr>
+<td>$share</td>
+<td>Рассказал друзьям</td>
+</tr>
+<tr>
+<td>$registered</td>
+<td>Зарегистрировался в CarrotQuest</td>
+</tr>
+</tbody></table>
+
+<h3 id="Параметры">Параметры</h3>
+
+<table><thead>
+<tr>
+<th>Название</th>
+<th>Описание</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>name</td>
+<td><strong>обязательный</strong> Название события</td>
+</tr>
+<tr>
+<td>app</td>
+<td><strong>обязательный</strong> ID приложения</td>
+</tr>
+<tr>
+<td>user</td>
+<td><strong>обязательный</strong> ID пользователя</td>
+</tr>
+<tr>
+<td>object_type</td>
+<td>Тип объекта</td>
+</tr>
+<tr>
+<td>object_name</td>
+<td>Имя объекта</td>
+</tr>
+<tr>
+<td>object_id</td>
+<td>ID объекта</td>
+</tr>
+<tr>
+<td>object_url</td>
+<td>URL объекта</td>
+</tr>
+</tbody></table>
+
+<h3 id="Вовзращаемое-значение">Вовзращаемое значение</h3>
+
+<p>В случае успеха, в перменной <code class="prettyprint">carrots</code> возвращается количество морковок у пользователя,
+который совершил событие.</p>
 
       </div>
       <div class="dark-box">
